@@ -88,12 +88,7 @@ export default function App() {
         />
       );
     case "success":
-      return (
-        <Success
-          member={member}
-          onHome={() => setScreen("home")}
-        />
-      );
+      return <Success member={member} onHome={() => setScreen("home")} />;
     case "invite":
       return (
         <AppInvite
