@@ -759,6 +759,10 @@ h1 {
   text-align: center;
   width: min(320px, 90vw);
 }
+.modal .card > .btn {
+  width: min(100%, 180px);
+  margin-inline: auto;
+}
 .spin {
   padding: 40px;
   text-align: center;
