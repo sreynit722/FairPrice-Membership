@@ -23,6 +23,10 @@ export default function App() {
   // Returning visitors go straight to Home
   useEffect(() => {
     if (isAdmin) return;
+    if (new URLSearchParams(window.location.search).get("join") === "1") {
+      setScreen("join");
+      return;
+    }
     const id = localStorage.getItem(KEY);
     if (!id) return setScreen("poster");
     getMember(id)

@@ -31,6 +31,12 @@ import {
 
 const money = (n) => `$${Number(n).toFixed(2)}`;
 const DEMO_CODE = "123456";
+const getJoinUrl = () => {
+  const url = new URL(window.location.href);
+  url.searchParams.set("join", "1");
+  url.hash = "";
+  return url.toString();
+};
 
 /* ---------- shared bits ---------- */
 const Mark = ({ suffix = "Quick Membership" }) => (
@@ -44,7 +50,7 @@ const Mark = ({ suffix = "Quick Membership" }) => (
 const WebBar = () => (
   <div className="webbar">
     <Lock size={12} />
-    join.fairprice.demo
+    {window.location.host}
   </div>
 );
 const Steps = ({ n }) => (
@@ -96,7 +102,7 @@ export function Poster({ onScan }) {
           </div>
         </div>
         <button className="scan" onClick={onScan} style={{ marginTop: "auto" }}>
-          <QRCodeSVG value="https://join.fairprice.demo" size={96} />
+          <QRCodeSVG value={getJoinUrl()} size={96} />
           <div>
             <h2>Scan to Join</h2>
             <small>Phone number only</small>
