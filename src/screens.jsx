@@ -89,19 +89,22 @@ export function Poster({ onScan }) {
         >
           Unlock Member Prices in less than a minute.
         </p>
-        <div className="compare" style={{ marginTop: 24 }}>
-          <div style={{ background: "rgba(255,255,255,.1)" }}>
-            <small style={{ color: "rgba(255,255,255,.7)" }}>
-              Normal Price
-            </small>
-            <p>$5.00</p>
-          </div>
-          <div style={{ background: "var(--red)" }}>
-            <small style={{ color: "#fff" }}>Member Price</small>
-            <p style={{ color: "#fff" }}>$4.20</p>
+        <div className="poster-deal">
+          <strong className="poster-deal-name">Fresh Beef Meat – 0.5 kg</strong>
+          <div className="poster-deal-prices">
+            <div>
+              <small>Normal Price</small>
+              <p>
+                <s>$5.00</s>
+              </p>
+            </div>
+            <div>
+              <small>Member Price</small>
+              <p>$4.20</p>
+            </div>
           </div>
         </div>
-        <button className="scan" onClick={onScan} style={{ marginTop: "auto" }}>
+        <button className="scan" onClick={onScan}>
           <QRCodeSVG value={getJoinUrl()} size={96} />
           <div>
             <h2>Scan to Join</h2>
@@ -504,14 +507,16 @@ export function Success({ member, onHome }) {
       qrImage.src = qrUrl;
       await new Promise((resolve, reject) => {
         qrImage.onload = resolve;
-        qrImage.onerror = () => reject(new Error("Could not prepare the QR code image."));
+        qrImage.onerror = () =>
+          reject(new Error("Could not prepare the QR code image."));
       });
 
       const canvas = document.createElement("canvas");
       canvas.width = 900;
       canvas.height = 940;
       const context = canvas.getContext("2d");
-      if (!context) throw new Error("Image download is not supported in this browser.");
+      if (!context)
+        throw new Error("Image download is not supported in this browser.");
 
       context.fillStyle = "#ffffff";
       context.fillRect(0, 0, canvas.width, canvas.height);
@@ -538,7 +543,12 @@ export function Success({ member, onHome }) {
       context.fillStyle = "#7a8498";
       context.font = "28px Arial, sans-serif";
       context.textAlign = "center";
-      context.fillText("Show this QR at checkout to access Member Prices.", 450, 670, 800);
+      context.fillText(
+        "Show this QR at checkout to access Member Prices.",
+        450,
+        670,
+        800,
+      );
 
       const imageBlob = await new Promise((resolve, reject) => {
         canvas.toBlob((blob) => {
@@ -553,7 +563,9 @@ export function Success({ member, onHome }) {
       link.click();
       URL.revokeObjectURL(imageUrl);
     } catch (error) {
-      setDownloadError(error.message || "Could not download the membership card.");
+      setDownloadError(
+        error.message || "Could not download the membership card.",
+      );
     } finally {
       if (qrUrl) URL.revokeObjectURL(qrUrl);
       setDownloading(false);
@@ -743,7 +755,11 @@ function MidweekDealsPage({ deals, member, onBack, onInvite, onSignOut }) {
   return (
     <div className="phone grey">
       <div className="topbar">
-        <button className="iconbtn" onClick={onBack} aria-label="Back to member page">
+        <button
+          className="iconbtn"
+          onClick={onBack}
+          aria-label="Back to member page"
+        >
           <ArrowLeft size={24} />
         </button>
         <h1 className="deals-page-title">Midweek Deals</h1>
@@ -751,9 +767,13 @@ function MidweekDealsPage({ deals, member, onBack, onInvite, onSignOut }) {
       <div className="deals-page-content">
         <p className="lead">All member deals</p>
         <div className="deal-grid">
-          {deals.map((deal) => <DealTile key={deal.id} deal={deal} />)}
+          {deals.map((deal) => (
+            <DealTile key={deal.id} deal={deal} />
+          ))}
         </div>
-        {!deals.length && <p className="lead">No deals are available right now.</p>}
+        {!deals.length && (
+          <p className="lead">No deals are available right now.</p>
+        )}
       </div>
       <nav className="nav">
         <button onClick={onBack}>
@@ -920,15 +940,12 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
         <div className="sechead">
           <h2>Midweek Deals</h2>
           {deals.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowDealsPage(true)}
-            >
+            <button type="button" onClick={() => setShowDealsPage(true)}>
               See all
             </button>
           )}
         </div>
-        <div className="banner">
+        <div className="banner" onClick={() => setShowDealsPage(true)}>
           <div className="ic">
             <Clock size={24} />
           </div>
@@ -939,13 +956,22 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
           <ChevronRight size={24} />
         </div>
         <div className="tiles">
-          {deals.map((deal) => <DealTile key={deal.id} deal={deal} />)}
+          {deals.map((deal) => (
+            <DealTile key={deal.id} deal={deal} />
+          ))}
         </div>
       </section>
 
       <section className="section">
         <h2>Member Prices</h2>
         <div className="card" style={{ marginTop: 12 }}>
+          <div className="row">
+            <span>Fresh Beef Meat – 0.5 kg</span>
+            <span className="p">
+              <s>{money(5)}</s>
+              {money(4.2)}
+            </span>
+          </div>
           {prices.map((p) => (
             <div className="row" key={p.id}>
               <span>{p.name}</span>
@@ -986,7 +1012,7 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
           </span>
           Member QR
         </button>
-        <button>
+        <button onClick={() => setShowDealsPage(true)}>
           <Tag size={24} />
           Offers
         </button>
