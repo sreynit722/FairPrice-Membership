@@ -47,7 +47,9 @@ export const createMember = async (phone, name, gender, age) => {
         phone,
         name,
         gender,
-        age_at_signup: age,
+        age,
+        points: 0,
+        saved_this_month: 0,
       })
       .select()
       .single(),

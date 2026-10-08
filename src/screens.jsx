@@ -356,8 +356,7 @@ export function Name({ phone, onDone }) {
           />
         </div>
         <p className="lead" style={{ fontSize: 14, marginTop: 12 }}>
-          Your age is based on your birth year and updates automatically each
-          year.
+          Enter your age in years.
         </p>
         {error && <p className="err">{error}</p>}
         <div className="grow" />
@@ -733,6 +732,13 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
     );
 
   const { deals, prices, rewards, activity } = data;
+  const when = (d) =>
+    new Date(d).toDateString() === new Date().toDateString()
+      ? "Today"
+      : new Date(d).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        });
   if (showDealsPage) {
     return (
       <MidweekDealsPage
@@ -746,13 +752,6 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
   }
 
   const reward = rewards.find((r) => r.status === "available");
-  const when = (d) =>
-    new Date(d).toDateString() === new Date().toDateString()
-      ? "Today"
-      : new Date(d).toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-        });
 
   return (
     <div className="phone grey">
