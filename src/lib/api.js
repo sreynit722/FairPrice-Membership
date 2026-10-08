@@ -14,20 +14,30 @@ export const prettyPhone = (e164) => {
 
 export const findMember = async (phone) =>
   ok(
-    await supabase.from("members").select("*").eq("phone", phone).maybeSingle(),
+    await supabase
+      .from("members_with_age")
+      .select("*")
+      .eq("phone", phone)
+      .maybeSingle(),
   );
 
 export const getMember = async (id) =>
-  ok(await supabase.from("members").select("*").eq("id", id).maybeSingle());
+  ok(
+    await supabase
+      .from("members_with_age")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle(),
+  );
 
-export const createMember = async (
-  phone,
-  name,
-  gender,
-  dateOfBirth,
-) => {
-  if (!name.trim() || !["Female", "Male"].includes(gender) || !dateOfBirth) {
-    throw new Error("Name, gender, and date of birth are required.");
+export const createMember = async (phone, name, gender, age) => {
+  if (
+    !name.trim() ||
+    !["Female", "Male"].includes(gender) ||
+    !Number.isInteger(age) ||
+    age < 0
+  ) {
+    throw new Error("Name, gender, and a valid age are required.");
   }
 
   const member = ok(
@@ -35,9 +45,9 @@ export const createMember = async (
       .from("members")
       .insert({
         phone,
-        name: name || null,
+        name,
         gender,
-        date_of_birth: dateOfBirth,
+        age_at_signup: age,
       })
       .select()
       .single(),
@@ -49,7 +59,11 @@ export const createMember = async (
       label: "Joined FairPrice Membership",
       tag: "Member Price",
     });
-  return member;
+  const memberWithAge = await getMember(member.id);
+  if (!memberWithAge) {
+    throw new Error("Member was created but could not be reloaded.");
+  }
+  return memberWithAge;
 };
 
 export const updateName = async (id, name) =>
@@ -85,7 +99,7 @@ export const unlockAppReward = async (member) => {
         tag: "+$2 reward",
       });
   }
-  return ok(
+  ok(
     await supabase
       .from("members")
       .update({ app_linked: true })
@@ -93,6 +107,11 @@ export const unlockAppReward = async (member) => {
       .select()
       .single(),
   );
+  const memberWithAge = await getMember(member.id);
+  if (!memberWithAge) {
+    throw new Error("Member was updated but could not be reloaded.");
+  }
+  return memberWithAge;
 };
 
 export const loadHome = async (memberId) => {

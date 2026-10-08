@@ -279,56 +279,22 @@ export function Verify({ phone, existing, onBack, onVerified }) {
 export function Name({ phone, onDone }) {
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
-  const [birthDate, setBirthDate] = useState({ month: "", day: "", year: "" });
+  const [age, setAge] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const years = Array.from(
-    { length: currentYear - 1899 },
-    (_, i) => currentYear - i,
-  );
-  const maxDayFor = (year, month) => {
-    const selectedYear = Number(year);
-    const selectedMonth = Number(month);
-    if (!selectedYear || !selectedMonth) return 31;
-    if (
-      selectedYear === currentYear &&
-      selectedMonth === today.getMonth() + 1
-    ) {
-      return today.getDate();
-    }
-    return new Date(selectedYear, selectedMonth, 0).getDate();
-  };
-  const selectedYear = Number(birthDate.year);
-  const selectedMonth = Number(birthDate.month);
-  const daysInMonth = maxDayFor(birthDate.year, birthDate.month);
-  const dateParts = [selectedYear, selectedMonth, Number(birthDate.day)];
-  const dateCandidate =
-    birthDate.year && birthDate.month && birthDate.day
-      ? new Date(Date.UTC(selectedYear, selectedMonth - 1, dateParts[2]))
-      : null;
-  const validBirthDate =
-    dateCandidate &&
-    dateCandidate.getUTCFullYear() === dateParts[0] &&
-    dateCandidate.getUTCMonth() === dateParts[1] - 1 &&
-    dateCandidate.getUTCDate() === dateParts[2] &&
-    dateCandidate <=
-      new Date(
-        Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
-      );
-  const dateOfBirth = validBirthDate
-    ? `${birthDate.year}-${birthDate.month.padStart(2, "0")}-${birthDate.day.padStart(2, "0")}`
-    : null;
-  const canCreate = Boolean(name.trim() && gender && dateOfBirth);
+  const maxAge = new Date().getFullYear() - 1900;
+  const numericAge = age === "" ? null : Number(age);
+  const validAge =
+    Number.isInteger(numericAge) && numericAge >= 0 && numericAge <= maxAge;
+  const canCreate = Boolean(name.trim() && gender && validAge);
 
   const create = async () => {
     if (!canCreate || busy) return;
     setBusy(true);
     setError("");
     try {
-      onDone(await createMember(phone, name.trim(), gender, dateOfBirth));
+      onDone(await createMember(phone, name.trim(), gender, numericAge));
     } catch (e) {
       setError(e.message);
       setBusy(false);
@@ -372,105 +338,26 @@ export function Name({ phone, onDone }) {
             <option value="Male">Male</option>
           </select>
         </div>
-        <span className="label">Date of Birth *</span>
-        <div className="dob-fields" role="group" aria-label="Date of birth">
-          <div className="field">
-            <select
-              aria-label="Birth month"
-              value={birthDate.month}
-              onChange={(e) =>
-                setBirthDate((current) => {
-                  const month = e.target.value;
-                  const day =
-                    Number(current.day) <= maxDayFor(current.year, month)
-                      ? current.day
-                      : "";
-                  return { ...current, month, day };
-                })
-              }
-              required
-            >
-              <option value="">Month</option>
-              {[
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ].map((month, i) => (
-                <option
-                  key={month}
-                  value={String(i + 1)}
-                  disabled={
-                    selectedYear === currentYear && i + 1 > today.getMonth() + 1
-                  }
-                >
-                  {month}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <select
-              aria-label="Birth day"
-              value={birthDate.day}
-              onChange={(e) =>
-                setBirthDate((current) => ({
-                  ...current,
-                  day: e.target.value,
-                }))
-              }
-              required
-            >
-              <option value="">Day</option>
-              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(
-                (day) => (
-                  <option key={day} value={String(day)}>
-                    {day}
-                  </option>
-                ),
-              )}
-            </select>
-          </div>
-          <div className="field">
-            <select
-              aria-label="Birth year"
-              value={birthDate.year}
-              onChange={(e) => {
-                const year = e.target.value;
-                setBirthDate((current) => {
-                  const month =
-                    Number(year) === currentYear &&
-                    Number(current.month) > today.getMonth() + 1
-                      ? ""
-                      : current.month;
-                  const day =
-                    month && Number(current.day) <= maxDayFor(year, month)
-                      ? current.day
-                      : "";
-                  return { ...current, year, month, day };
-                });
-              }}
-              required
-            >
-              <option value="">Year</option>
-              {years.map((year) => (
-                <option key={year} value={String(year)}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
+        <label className="label" htmlFor="age">
+          Age *
+        </label>
+        <div className="field">
+          <input
+            id="age"
+            type="number"
+            inputMode="numeric"
+            min="0"
+            max={maxAge}
+            step="1"
+            placeholder="Enter your age"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
+          />
         </div>
         <p className="lead" style={{ fontSize: 14, marginTop: 12 }}>
-          You can get birthday rewards.
+          Your age is based on your birth year and updates automatically each
+          year.
         </p>
         {error && <p className="err">{error}</p>}
         <div className="grow" />
@@ -513,7 +400,7 @@ export function Success({ member, onHome }) {
 
       const canvas = document.createElement("canvas");
       canvas.width = 900;
-      canvas.height = 940;
+      canvas.height = 740;
       const context = canvas.getContext("2d");
       if (!context)
         throw new Error("Image download is not supported in this browser.");
@@ -877,6 +764,9 @@ export function Home({ member, onMember, onSignOut, onInvite }) {
               FairPrice Member ·{" "}
               <span className="mono">{member.member_code}</span>
             </small>
+            {Number.isInteger(member.age) && (
+              <small>{member.age} years old</small>
+            )}
           </div>
           <button className="iconbtn" aria-label="Notifications">
             <Bell size={24} />

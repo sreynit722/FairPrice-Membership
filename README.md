@@ -12,6 +12,11 @@ Built from the Figma file "Business Idea Simulation Prototype".
 Poster → Join (phone) → Verify (demo code 123456) → Name → Success → App invite ($2 reward) → Home
 
 Returning phone numbers skip the Name step and go straight to Home.
+New members enter their age; Supabase stores the corresponding birth year and
+calculates their current age dynamically, so it advances each calendar year.
+Existing members with a full date of birth continue to use birthday-based age.
+For an existing Supabase project, run the latest migration in `supabase/migrations`
+before deploying the updated app.
 
 ## Supabase tables
 members, rewards, activity, deals, member_prices (see schema.sql).
